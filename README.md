@@ -4,6 +4,8 @@ This repository contains a collection of 13 lab assignments from the *Advanced V
 
 Each lab builds practical understanding through implementations using Python and OpenCV.
 
+Source images and videos were given by the university and are not available in this repository
+
 ---
 
 ##  Labs Overview
