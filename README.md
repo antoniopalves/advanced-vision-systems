@@ -1,4 +1,4 @@
-# Advanced Vision Systems 🔬📷
+# Advanced Vision Systems 
 
 This repository contains a collection of 13 lab assignments from the *Advanced Vision Systems* course from AGH University of Krakow. The labs explore core and advanced topics in computer vision, including image filtering, feature detection, segmentation, motion estimation, object recognition, stereo vision, and more.
 
@@ -6,7 +6,7 @@ Each lab builds practical understanding through implementations using Python and
 
 ---
 
-## 📁 Labs Overview
+##  Labs Overview
 
 | Lab | Topic                  | Summary                                                                 |
 |-----|------------------------|-------------------------------------------------------------------------|
@@ -37,9 +37,9 @@ Each lab builds practical understanding through implementations using Python and
 - NumPy
 - Matplotlib
 
-## 📚 Educational Purpose
+## Educational Purpose
 This repository is intended for educational use and was developed as part of a university-level course. It applies theoretical computer vision concepts in practical, hands-on assignments.
 
-## 🧑‍💻 Author
+##  Author
 Developed by António Alves as part of the Advanced Vision Systems course.
 
