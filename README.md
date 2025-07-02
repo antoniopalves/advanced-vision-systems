@@ -37,9 +37,9 @@ Each lab builds practical understanding through implementations using Python and
 - NumPy
 - Matplotlib
 
-📚 Educational Purpose
+## 📚 Educational Purpose
 This repository is intended for educational use and was developed as part of a university-level course. It applies theoretical computer vision concepts in practical, hands-on assignments.
 
-🧑‍💻 Author
+## 🧑‍💻 Author
 Developed by António Alves as part of the Advanced Vision Systems course.
 
