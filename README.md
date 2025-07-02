@@ -26,11 +26,11 @@ Source images and videos were given by the university and are not available in t
 | 12  | Classification         | Image classification using traditional ML or CNNs (if used)           |
 | 13  | Final Integration      | Combined techniques in a single application or summary project         |
 
-> 🧪 Most labs are implemented in **Python** using **OpenCV**, with possible use of NumPy, Matplotlib, and other vision libraries.
+>  Most labs are implemented in **Python** using **OpenCV**, with possible use of NumPy, Matplotlib, and other vision libraries.
 
 ---
 
-## 🚀 Getting Started
+##  Getting Started
 
 ### Requirements
 
