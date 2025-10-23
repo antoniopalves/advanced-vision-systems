@@ -1,119 +1,129 @@
-# Background Subtraction Experiments — AVS Lab
+# Optical Flow — AVS Lab 4
 
 ## Overview
-This repository contains Python scripts developed for the **Advanced Vision Systems (AVS)** course.  
-Each script implements and evaluates a **background subtraction** method using image sequences from the **PETS Pedestrian Dataset**.  
-Goal: compare traditional algorithms with deep-learning-based inference (BSUV-Net).
+This lab explores **optical flow estimation** using both **classical** and **deep learning–based** approaches.  
+It aims to understand how motion between consecutive frames can be estimated through pixel correspondences and learned flow fields.
 
 ---
 
-## Structure
-- **3.1.py** → Mean/Median Buffer Method  
-- **3.2.py** → Incremental Mean and Median Approximation  
-- **3.3.py** → Conservative Update for Background Models  
-- **3.4.py** → OpenCV MOG2 Background Subtraction  
-- **3.5.py** → OpenCV KNN Background Subtraction  
-- **inference.py** → BSUV-Net Deep Learning Inference  
-- **infer_config_autoBG.py** → Config file for automatic background setup
+## Folder Contents
+| File | Description |
+|------|--------------|
+| **4.1.py** | Block-based optical flow (Sum of Squared Differences). |
+| **4.2.py** | Multi-scale (pyramidal) block matching. |
+| **correlation.py** | CUDA kernel for correlation layer (used in LiteFlowNet). |
+| **run_spynet.py** | Deep learning optical flow using **SpyNet** (PyTorch). |
+| **run_liteflownet.py** | Deep learning optical flow using **LiteFlowNet** (PyTorch). |
+| **I.jpg, J.jpg** | Input frame pair used for classical methods. |
+| **cm1.png, cm2.png, cm_gt.png** | Color maps of flow results and ground truth. |
 
 ---
 
-## Scripts Summary
+## Classical Methods
 
-### 3.1 — Buffer-Based Background Modeling
-Uses a sliding buffer of N frames to compute mean and median background models.  
-Foreground is detected via absolute difference and thresholding.  
-Outputs precision, recall, and F1-score for both mean and median models.
+### **4.1.py — Block Matching**
+Implements dense optical flow by comparing square blocks between two grayscale images.  
+For each pixel, the algorithm finds the block displacement that minimizes the **Sum of Squared Differences (SSD)**.
 
-### 3.2 — Incremental Approximation (Mean & Median)
-Implements recursive updates:
-- Mean: `B_t = α·I_t + (1−α)·B_{t−1}`
-- Median: pixel-wise incremental adjustment  
-Memory efficient and adaptive to slow illumination changes.
+**Steps:**
+1. Convert frames to grayscale.  
+2. Define search and block windows.  
+3. Compute SSD for every displacement.  
+4. Assign the best (dx, dy) as the local flow vector.  
+5. Visualize results in HSV (Hue: direction, Saturation: magnitude).
 
-### 3.3 — Conservative Update
-Extends 3.2 by updating the background **only on background pixels**.  
-Avoids contamination by moving objects.  
-Computes precision, recall, and F1 for both mean and median methods.
-
-### 3.4 — MOG2 (Gaussian Mixture Model)
-Uses `cv2.createBackgroundSubtractorMOG2()`.  
-Models complex backgrounds with multiple intensity modes per pixel.  
-Provides better noise tolerance and adaptability.
-
-### 3.5 — KNN Background Subtraction
-Uses `cv2.createBackgroundSubtractorKNN()`.  
-Pixel classification via K-nearest-neighbors statistics.  
-Evaluated on the same pedestrian dataset for comparison.
-
-### inference.py — BSUV-Net Deep Learning
-Runs background subtraction using a pretrained **BSUV-Net** model (PyTorch).  
-Loads a video, processes each frame, and saves visualization output combining:
-- Original frame  
-- Binary mask  
-- Overlay (foreground on background)
-
-Outputs FPS and segmentation results.
-
-### infer_config_autoBG.py — Configuration
-Holds parameters for inference:
-- Model path  
-- Background type (automatic/manual)  
-- Normalization parameters  
-- Optional HRNet semantic segmentation setup
+**Output:** HSV image showing motion direction and intensity.
 
 ---
 
-## How to Run
+### **4.2.py — Image Pyramid Approach**
+Extends the block matching method with a **multi-scale pyramid**:
+- Coarser resolutions capture large displacements.
+- Finer levels refine local details.
 
-### Classical Methods
-```bash
-python 3.1.py
-python 3.2.py
-python 3.3.py
-python 3.4.py
-python 3.5.py
-```
-Dataset paths inside each script:
-- Input: `...\Lab2\pedestrian\input`
-- Ground truth: `...\Lab2\pedestrian\groundtruth`
-
-### Deep Learning Inference
-```bash
-python inference.py
-```
-Edit `inp_path` and `out_path` inside the script to match your files.
+**Pipeline:**
+1. Build Gaussian pyramids for both images.  
+2. Compute optical flow at each scale.  
+3. Upsample flow to higher resolution and refine iteratively.  
+4. Visualize results per scale using HSV encoding.
 
 ---
 
-## Evaluation Metrics
-All scripts report:
-- **Precision (P)** = TP / (TP + FP)  
-- **Recall (R)** = TP / (TP + FN)  
-- **F1 Score** = 2PR / (P + R)
+## Deep Learning Methods
+
+### **run_spynet.py — SpyNet**
+Implementation of **SpyNet**, a compact CNN trained for optical flow estimation.  
+SpyNet combines:
+- Pyramid processing (coarse-to-fine).
+- Small convolutional refinement networks at each level.
+
+**Features:**
+- Fast inference on GPU.  
+- Lightweight (~1.2M parameters).  
+- Pretrained on **Sintel** dataset.  
+- Outputs dense flow maps for arbitrary image pairs.
+
+**Visualization:** Uses OpenCV HSV color coding for direction and magnitude.
+
+---
+
+### **run_liteflownet.py — LiteFlowNet**
+A high-performance optical flow model based on **correlation layers** and **feature warping**.  
+Implements the complete LiteFlowNet pipeline:
+- Feature extraction.  
+- Cost volume computation (via `correlation.py`).  
+- Multi-stage matching and refinement.  
+- Sub-pixel flow correction and regularization.
+
+**Requirements:**
+- CUDA + cuDNN  
+- PyTorch ≥ 1.3  
+- Internet access for pretrained model download
+
+**Output:** Flow visualization per frame pair using HSV mapping.
+
+---
+
+## Comparison
+| Method | Type | Data Requirement | Speed | Accuracy | GPU Use |
+|--------|------|------------------|--------|-----------|----------|
+| 4.1.py | Classical SSD | None | Slow | Low | No |
+| 4.2.py | Classical Pyramid | None | Moderate | Medium | No |
+| SpyNet | CNN | Pretrained | Fast | High | Yes |
+| LiteFlowNet | CNN | Pretrained | Medium | Very High | Yes |
 
 ---
 
 ## Dependencies
 ```bash
-pip install numpy opencv-python torch torchvision
+pip install numpy opencv-python torch torchvision pillow
+```
+
+For GPU-based models:
+```bash
+pip install cupy-cuda12x
 ```
 
 ---
 
-## Summary Table
+## Run Examples
 
-| Script | Method | Type | Adaptive | Deep Learning | Conservative Update |
-|--------|---------|------|-----------|----------------|---------------------|
-| 3.1 | Buffer Mean/Median | Classical | ✗ | ✗ | ✗ |
-| 3.2 | Incremental Approximation | Classical | ✓ | ✗ | ✗ |
-| 3.3 | Conservative Mean/Median | Classical | ✓ | ✗ | ✓ |
-| 3.4 | MOG2 | OpenCV | ✓ | ✗ | ✗ |
-| 3.5 | KNN | OpenCV | ✓ | ✗ | ✗ |
-| inference.py | BSUV-Net | Deep Learning | ✓ | ✓ | ✓ |
+### Classical
+```bash
+python 4.1.py
+python 4.2.py
+```
+
+### Deep Learning
+```bash
+python run_spynet.py
+python run_liteflownet.py
+```
+
+Each will display a **flow visualization window** showing pixel motion between frames.
 
 ---
 
 **Author:** António Alves  
-**Course:** Advanced Vision Systems (AVS), FCT NOVA  
-**Purpose:** Comparative study of background subtraction methods in video surveillance
+**Course:** Advanced Vision Systems (AVS) — FCT NOVA  
+**Topic:** Optical Flow — Classical vs Deep Learning Methods
