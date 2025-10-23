@@ -1,10 +1,10 @@
 # Advanced Vision Systems 
 
-This repository contains a collection of 13 lab assignments from the *Advanced Vision Systems* course from AGH University of Krakow. The labs explore core and advanced topics in computer vision, including image filtering, feature detection, segmentation, motion estimation, object recognition, stereo vision, and more.
+This repository contains a collection of 13 lab assignments solved by me, from the *Advanced Vision Systems* course from AGH University of Krakow. The labs explore core and advanced topics in computer vision, including image filtering, feature detection, segmentation, motion estimation, object recognition, stereo vision, and more.
 
 Each lab builds practical understanding through implementations using Python and OpenCV.
 
-Source images and videos were given by the university and are not available in this repository
+Source exercises, images and videos were given by the university and are not available in this repository.
 
 ---
 
